@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Admin Panel | UrbanSolve</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="shortcut icon" href="./logo2.png.jpg" type="image/x-icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            margin: 0;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background-color: white;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .gds {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .highlight {
+            color: orange;
+        }
+
+        .btn5 {
+            background-color: #ff9966;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn5:hover {
+            background-color: #ff7f50;
+        }
+
+        .main-content {
+            margin-top: 90px;
+            padding: 20px;
+        }
+
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+            overflow-x: auto;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #ffcc00;
+            color: black;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        input[type="text"], select {
+            padding: 10px;
+            width: 200px;
+            border: 2px solid #ffcc00;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+
+        input[type="text"]:focus, select:focus {
+            border-color: #e6b800;
+            outline: none;
+            box-shadow: 0 0 8px rgba(255, 204, 0, 0.5);
+        }
+        
+        .refresh-btn, .action-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+        }
+        
+        .refresh-btn:hover, .action-btn:hover {
+            background-color: #45a049;
+        }
+
+        .action-btn.assign {
+            background-color: #2196F3;
+        }
+
+        .action-btn.assign:hover {
+            background-color: #0b7dda;
+        }
+
+        .action-btn.resolve {
+            background-color: #ff9800;
+        }
+
+        .action-btn.resolve:hover {
+            background-color: #e68a00;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .search-filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .badge.pending {
+            background-color: #ffeeba;
+            color: #856404;
+        }
+
+        .badge.in-progress {
+            background-color: #b8daff;
+            color: #004085;
+        }
+
+        .badge.resolved {
+            background-color: #c3e6cb;
+            color: #155724;
+        }
+
+        .dashboard-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .dashboard-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .dashboard-card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .dashboard-card .count {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff9966;
+            margin: 10px 0;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 8px 16px;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .pagination button:hover {
+            background-color: #f1f1f1;
+        }
+
+        .pagination button.active {
+            background-color: #ffcc00;
+            color: white;
+            border-color: #ffcc00;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .search-filters {
+                flex-direction: column;
+            }
+            
+            input[type="text"], select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="gds">
+        <a class="nabh" href="loggined_page.html">
+            <img src="./logo3.png.jpg" alt="" height="50px" width="60px">
+        </a>
+        <a class="nabh" href="loggined_page.html">
+            <div class="logo">Urban<span class="highlight">Solve</span>(Super Admin)</div>
+        </a>
+    </div>
+    <!-- Removed logout button -->
+</nav>
+
+<!-- Main Content -->
+<div class="main-content">
+
+    <!-- Dashboard Summary -->
+    <h2>Super Admin Dashboard</h2>
+    <div class="dashboard-cards">
+        <div class="dashboard-card">
+            <h3>Total Reports</h3>
+            <div class="count" id="totalReports">0</div>
+        </div>
+        <div class="dashboard-card">
+            <h3>Pending</h3>
+            <div class="count" id="pendingReports">0</div>
+        </div>
+        <div class="dashboard-card">
+            <h3>In Progress</h3>
+            <div class="count" id="inProgressReports">0</div>
+        </div>
+        <div class="dashboard-card">
+            <h3>Resolved</h3>
+            <div class="count" id="resolvedReports">0</div>
+        </div>
+    </div>
+
+    <!-- Reports Table -->
+    <div class="section-header">
+        <h2>All User Reports</h2>
+        <button class="refresh-btn" onclick="loadReports()">
+            <span>Refresh Reports</span>
+        </button>
+    </div>
+
+    <div class="search-filters">
+        <input type="text" id="reportSearch" placeholder="Search reports..." oninput="filterReports()">
+        <select id="categoryFilter" onchange="filterReports()">
+            <option value="">All Categories</option>
+            <option value="Road">Road</option>
+            <option value="Water">Water</option>
+            <option value="Electricity">Electricity</option>
+            <option value="Sanitation">Sanitation</option>
+            <option value="Other">Other</option>
+        </select>
+        <select id="statusFilter" onchange="filterReports()">
+            <option value="">All Statuses</option>
+            <option value="Pending">Pending</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Resolved">Resolved</option>
+        </select>
+        <select id="userFilter" onchange="filterReports()">
+            <option value="">All Users</option>
+            <!-- User options will be populated dynamically -->
+        </select>
+    </div>
+
+    <div class="table-container">
+        <table id="reportsTable">
+            <tr>
+                <th>ID</th>
+                <th>User</th>
+                <th>Category</th>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Scheme Number</th>
+                <th>Status</th>
+                <th>Vendor</th>
+                <th>Location</th>
+                <th>Actions</th>
+            </tr>
+            <!-- Reports will be loaded dynamically -->
+        </table>
+    </div>
+    
+    <div class="pagination" id="reportsPagination">
+        <!-- Pagination will be added dynamically -->
+    </div>
+
+    <!-- Vendor Management -->
+    <div class="section-header">
+        <h2>Vendor Management</h2>
+        <button class="refresh-btn" onclick="loadVendors()">Refresh Vendors</button>
+    </div>
+    
+    <div class="search-filters">
+        <input type="text" id="schemeSearch" placeholder="Search by Scheme" oninput="searchByScheme()">
+        <input type="text" id="vendorSearch" placeholder="Search by Name" oninput="searchVendors()">
+        <select id="specializationFilter" onchange="searchVendors()">
+            <option value="">All Specializations</option>
+            <option value="Road Repair">Road Repair</option>
+            <option value="Streetlights">Streetlights</option>
+            <option value="Water Supply">Water Supply</option>
+            <option value="Sanitation">Sanitation</option>
+        </select>
+    </div>
+
+    <div class="table-container">
+        <table id="vendorsTable">
+            <tr>
+                <th>Vendor ID</th>
+                <th>Name</th>
+                <th>Specialization</th>
+                <th>Pending Work</th>
+                <th>Area of Work</th>
+                <th>Scheme Number</th>
+                <th>Actions</th>
+            </tr>
+            <tr>
+                <td>V001</td>
+                <td>Vendor A</td>
+                <td>Road Repair</td>
+                <td>2</td>
+                <td>Downtown</td>
+                <td>123</td>
+                <td>
+                    <button class="action-btn" onclick="editVendor('V001')">Edit</button>
+                </td>
+            </tr>
+            <tr>
+                <td>V002</td>
+                <td>Vendor B</td>
+                <td>Streetlights</td>
+                <td>3</td>
+                <td>Suburbs</td>
+                <td>654</td>
+                <td>
+                    <button class="action-btn" onclick="editVendor('V002')">Edit</button>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+</div>
+
+<!-- Scripts -->
+<script>
+    // Global variables for user authentication
+    window.currentUserEmail = null;
+    window.currentUserId = null;
+    window.allUsers = []; // To store all users for filtering
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get current user email from session
+        fetch('/check-auth')
+            .then(response => response.json())
+            .then(data => {
+                if (data.loggedIn) {
+                    window.currentUserEmail = data.user.email;
+                    window.currentUserId = data.user.id;
+                    
+                    // Update the page title to reflect super admin view
+                    document.title = 'Super Admin Panel | UrbanSolve';
+                    
+                    // Load all users first
+                    fetchAllUsers().then(() => {
+                        // Then load reports after getting user info
+                        loadReports();
+                        loadVendors();
+                        updateDashboard();
+                    });
+                } else {
+                    // Redirect to login if not authenticated
+                    window.location.href = '/login';
+                }
+            })
+            .catch(error => {
+                console.error('Authentication check failed:', error);
+                window.location.href = '/login';
+            });
+    });
+
+    // Function to fetch all users
+    function fetchAllUsers() {
+        return fetch('/api/admin/all-users')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error fetching users');
+                }
+                return response.json();
+            })
+            .then(users => {
+                window.allUsers = users;
+                
+                // Populate user filter dropdown
+                const userFilter = document.getElementById('userFilter');
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.email;
+                    option.textContent = user.email;
+                    userFilter.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching users:', error);
+            });
+    }
+    
+    // Global variables for pagination
+    let currentPage = 1;
+    let reportsPerPage = 10;
+    let allReports = [];
+
+    function updateDashboard() {
+        // This function would update the dashboard with actual counts
+        document.getElementById('totalReports').textContent = allReports.length || '0';
+        
+        // Count reports by status
+        const pending = allReports.filter(r => r.status === 'Pending').length || 0;
+        const inProgress = allReports.filter(r => r.status === 'In Progress').length || 0;
+        const resolved = allReports.filter(r => r.status === 'Resolved').length || 0;
+        
+        document.getElementById('pendingReports').textContent = pending;
+        document.getElementById('inProgressReports').textContent = inProgress;
+        document.getElementById('resolvedReports').textContent = resolved;
+    }
+
+    function loadReports() {
+        // Show loading indicator
+        const table = document.getElementById('reportsTable');
+        const loadingRow = table.insertRow(1);
+        const loadingCell = loadingRow.insertCell(0);
+        loadingCell.colSpan = 10;
+        loadingCell.textContent = 'Loading all reports...';
+        
+        // Fetch all reports (not filtered by user)
+        fetch('/api/admin/all-reports')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(reports => {
+                allReports = reports;
+                
+                // Remove loading indicator
+                if (table.rows.length > 1) {
+                    table.deleteRow(1);
+                }
+                
+                updateDashboard();
+                displayReports(currentPage);
+                setupPagination();
+            })
+            .catch(error => {
+                console.error('Error loading reports:', error);
+                
+                // Remove loading indicator
+                if (table.rows.length > 1) {
+                    table.deleteRow(1);
+                }
+                
+                // Show error message
+                const errorRow = table.insertRow(1);
+                const errorCell = errorRow.insertCell(0);
+                errorCell.colSpan = 10;
+                errorCell.textContent = 'Failed to load reports. Please try again later.';
+                errorCell.style.color = 'red';
+                errorCell.style.textAlign = 'center';
+                
+                // Add a retry button
+                const retryBtn = document.createElement('button');
+                retryBtn.textContent = 'Retry';
+                retryBtn.className = 'refresh-btn';
+                retryBtn.style.margin = '10px auto';
+                retryBtn.style.display = 'block';
+                retryBtn.onclick = loadReports;
+                errorCell.appendChild(document.createElement('br'));
+                errorCell.appendChild(retryBtn);
+            });
+    }
+
+    function displayReports(page) {
+        const startIndex = (page - 1) * reportsPerPage;
+        const endIndex = startIndex + reportsPerPage;
+        const paginatedReports = allReports.slice(startIndex, endIndex);
+        
+        const table = document.getElementById('reportsTable');
+        // Keep the header row (index 0) and remove all other rows
+        while (table.rows.length > 1) {
+            table.deleteRow(1);
+        }
+
+        if (paginatedReports.length === 0) {
+            const noDataRow = table.insertRow();
+            const noDataCell = noDataRow.insertCell(0);
+            noDataCell.colSpan = 10;
+            noDataCell.textContent = 'No reports found';
+            noDataCell.style.textAlign = 'center';
+            noDataCell.style.padding = '20px';
+            return;
+        }
+
+        paginatedReports.forEach(report => {
+            const row = table.insertRow();
+            row.insertCell(0).textContent = report.id;
+            row.insertCell(1).textContent = report.user_email || "Anonymous";
+            row.insertCell(2).textContent = report.category;
+            row.insertCell(3).textContent = report.title;
+            row.insertCell(4).textContent = report.description;
+            row.insertCell(5).textContent = report.scheme_number || '';
+            
+            const statusCell = row.insertCell(6);
+            const statusBadge = document.createElement('span');
+            statusBadge.textContent = report.status;
+            statusBadge.className = 'badge';
+            
+            if (report.status === 'Pending') {
+                statusBadge.classList.add('pending');
+            } else if (report.status === 'In Progress') {
+                statusBadge.classList.add('in-progress');
+            } else if (report.status === 'Resolved') {
+                statusBadge.classList.add('resolved');
+            }
+            
+            statusCell.appendChild(statusBadge);
+
+            const vendorCell = row.insertCell(7);
+            if (report.vendor) {
+                vendorCell.textContent = report.vendor;
+            } else {
+                vendorCell.innerHTML = `
+                    <select id="vendor-${report.id}">
+                        <option value="">Select Vendor</option>
+                        <option value="Vendor A">Vendor A (Road Repair)</option>
+                        <option value="Vendor B">Vendor B (Streetlights)</option>
+                        <option value="Vendor C">Vendor C (Water Supply)</option>
+                        <option value="Vendor D">Vendor D (Sanitation)</option>
+                    </select>
+                    <button class="action-btn assign" onclick="assignVendor(${report.id})">Assign</button>
+                `;
+            }
+
+            row.insertCell(8).textContent = report.location || "Location not specified";
+            
+            const actionsCell = row.insertCell(9);
+            if (report.status !== 'Resolved') {
+                actionsCell.innerHTML = `
+                    <button class="action-btn resolve" onclick="resolveReport(${report.id})">Mark Resolved</button>
+                `;
+            } else {
+                actionsCell.textContent = 'No actions available';
+            }
+        });
+    }
+
+    function setupPagination() {
+        const totalPages = Math.ceil(allReports.length / reportsPerPage);
+        const pagination = document.getElementById('reportsPagination');
+        pagination.innerHTML = '';
+        
+        if (totalPages <= 1) return;
+        
+        // Previous button
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Previous';
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                displayReports(currentPage);
+                setupPagination();
+            }
+        });
+        pagination.appendChild(prevButton);
+        
+        // Page buttons
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            if (i === currentPage) {
+                pageButton.classList.add('active');
+            }
+            pageButton.addEventListener('click', () => {
+                currentPage = i;
+                displayReports(currentPage);
+                setupPagination();
+            });
+            pagination.appendChild(pageButton);
+        }
+        
+        // Next button
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Next';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                displayReports(currentPage);
+                setupPagination();
+            }
+        });
+        pagination.appendChild(nextButton);
+    }
+
+    function assignVendor(reportId) {
+        const vendor = document.getElementById(`vendor-${reportId}`).value;
+        if (!vendor) {
+            alert("Please select a vendor first");
+            return;
+        }
+
+        fetch(`/api/reports/${reportId}/assign`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ vendor: vendor })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Successfully assigned report #${reportId} to ${vendor}`);
+                // Update the report status to "In Progress" in our local data
+                const report = allReports.find(r => r.id === reportId);
+                if (report) {
+                    report.status = 'In Progress';
+                    report.vendor = vendor;
+                }
+                displayReports(currentPage);
+                updateDashboard();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while assigning the vendor.');
+            
+            // For demo purposes, let's simulate success
+            const report = allReports.find(r => r.id === reportId);
+            if (report) {
+                report.status = 'In Progress';
+                report.vendor = vendor;
+            }
+            displayReports(currentPage);
+            updateDashboard();
+        });
+    }
+
+    function resolveReport(reportId) {
+        if (!confirm(`Are you sure you want to mark report #${reportId} as resolved?`)) {
+            return;
+        }
+        
+        fetch(`/api/reports/${reportId}/resolve`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(`Successfully resolved report #${reportId}`);
+                // Update local data
+                const report = allReports.find(r => r.id === reportId);
+                if (report) {
+                    report.status = 'Resolved';
+                }
+                displayReports(currentPage);
+                updateDashboard();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while resolving the report.');
+            
+            // For demo purposes, simulate success
+            const report = allReports.find(r => r.id === reportId);
+            if (report) {
+                report.status = 'Resolved';
+            }
+            displayReports(currentPage);
+            updateDashboard();
+        });
+    }
+
+    function filterReports() {
+        const searchTerm = document.getElementById('reportSearch').value.toLowerCase();
+        const categoryFilter = document.getElementById('categoryFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+        const userFilter = document.getElementById('userFilter').value;
+        
+        // Reset to first page when filtering
+        currentPage = 1;
+        
+        // Apply filters to the reports table
+        const filteredReports = allReports.filter(report => {
+            const matchesSearch = 
+                report.title.toLowerCase().includes(searchTerm) || 
+                report.description.toLowerCase().includes(searchTerm) ||
+                (report.user_email && report.user_email.toLowerCase().includes(searchTerm)) ||
+                (report.location && report.location.toLowerCase().includes(searchTerm));
+            
+            const matchesCategory = !categoryFilter || report.category === categoryFilter;
+            const matchesStatus = !statusFilter || report.status === statusFilter;
+            const matchesUser = !userFilter || (report.user_email && report.user_email === userFilter);
+            
+            return matchesSearch && matchesCategory && matchesStatus && matchesUser;
+        });
+        
+        // Update the display with filtered reports
+        const table = document.getElementById('reportsTable');
+        while (table.rows.length > 1) {
+            table.deleteRow(1);
+        }
+        
+        // Slice the filtered reports for the current page
+        const startIndex = (page - 1) * reportsPerPage;
+        const endIndex = startIndex + reportsPerPage;
+        const paginatedReports = filteredReports.slice(startIndex, endIndex);
+        
+        // Display the filtered and paginated reports
+        paginatedReports.forEach(report => {
+            const row = table.insertRow();
+            row.insertCell(0).textContent = report.id;
+            row.insertCell(1).textContent = report.user_email || "Anonymous";
+            row.insertCell(2).textContent = report.category;
+            row.insertCell(3).textContent = report.title;
+            row.insertCell(4).textContent = report.description;
+            row.insertCell(5).textContent = report.scheme_number || '';
+            
+            const statusCell = row.insertCell(6);
+            const statusBadge = document.createElement('span');
+            statusBadge.textContent = report.status;
+            statusBadge.className = 'badge';
+            
+            if (report.status === 'Pending') {
+                statusBadge.classList.add('pending');
+            } else if (report.status === 'In Progress') {
+                statusBadge.classList.add('in-progress');
+            } else if (report.status === 'Resolved') {
+                statusBadge.classList.add('resolved');
+            }
+            
+            statusCell.appendChild(statusBadge);
+
+            const vendorCell = row.insertCell(7);
+            if (report.vendor) {
+                vendorCell.textContent = report.vendor;
+            } else {
+                vendorCell.innerHTML = `
+                    <select id="vendor-${report.id}">
+                        <option value="">Select Vendor</option>
+                        <option value="Vendor A">Vendor A (Road Repair)</option>
+                        <option value="Vendor B">Vendor B (Streetlights)</option>
+                        <option value="Vendor C">Vendor C (Water Supply)</option>
+                        <option value="Vendor D">Vendor D (Sanitation)</option>
+                    </select>
+                    <button class="action-btn assign" onclick="assignVendor(${report.id})">Assign</button>
+                `;
+            }
+
+            row.insertCell(8).textContent = report.location || "Location not specified";
+            
+            const actionsCell = row.insertCell(9);
+            if (report.status !== 'Resolved') {
+                actionsCell.innerHTML = `
+                    <button class="action-btn resolve" onclick="resolveReport(${report.id})">Mark Resolved</button>
+                `;
+            } else {
+                actionsCell.textContent = 'No actions available';
+            }
+        });
+        
+        // Update pagination for filtered results
+        const totalPages = Math.ceil(filteredReports.length / reportsPerPage);
+        const pagination = document.getElementById('reportsPagination');
+        pagination.innerHTML = '';
+        
+        if (totalPages <= 1) return;
+        
+        // Previous button
+        const prevButton = document.createElement('button');
+        prevButton.textContent = 'Previous';
+        prevButton.disabled = currentPage === 1;
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                filterReports();
+            }
+        });
+        pagination.appendChild(prevButton);
+        
+        // Page buttons
+        for (let i = 1; i <= totalPages; i++) {
+            const pageButton = document.createElement('button');
+            pageButton.textContent = i;
+            if (i === currentPage) {
+                pageButton.classList.add('active');
+            }
+            pageButton.addEventListener('click', () => {
+                currentPage = i;
+                filterReports();
+            });
+            pagination.appendChild(pageButton);
+        }
+        
+        // Next button
+        const nextButton = document.createElement('button');
+        nextButton.textContent = 'Next';
+        nextButton.disabled = currentPage === totalPages;
+        nextButton.addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                currentPage++;
+                filterReports();
+            }
+        });
+        pagination.appendChild(nextButton);
+    }
+
+    function searchByScheme() {
+        let scheme = document.getElementById("schemeSearch").value;
+        let rows = document.querySelectorAll("#vendorsTable tr");
+        rows.forEach((row, index) => {
+            if (index === 0) return; // Skip header row
+            let vendorPincode = row.cells[5].textContent.trim();
+            row.style.display = (vendorPincode.includes(scheme) || scheme === "") ? "" : "none";
+        });
+    }
+
+    function searchVendors() {
+        const vendorSearch = document.getElementById("vendorSearch").value.toLowerCase();
+        const specializationFilter = document.getElementById("specializationFilter").value;
+        
+        let rows = document.querySelectorAll("#vendorsTable tr");
+        rows.forEach((row, index) => {
+            if (index === 0) return; // Skip header row
+            
+            const vendorName = row.cells[1].textContent.trim().toLowerCase();
+            const specialization = row.cells[2].textContent.trim();
+            
+            const matchesName = vendorName.includes(vendorSearch);
+            const matchesSpecialization = !specializationFilter || specialization === specializationFilter;
+            
+            row.style.display = (matchesName && matchesSpecialization) ? "" : "none";
+        });
+    }
+
+    function editVendor(vendorId) {
+        // Implement vendor editing functionality
+        alert(`Editing vendor ${vendorId}. This feature is coming soon.`);
+    }
+
+    // Poll for new reports every 30 seconds
+    setInterval(loadReports, 30000);
+</script>
+
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'930e0360fccc5455',t:'MTc0NDc0NzA1OS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'93112a0bdba5bfea',t:'MTc0NDc4MDEwMC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="shortcut icon" href="./logo2.png.jpg" type="image/x-icon">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>City Issue Reporting</title>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" defer></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            background: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            flex-direction: column;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+        input[type="file"] {
+            border: none;
+        }
+        #map {
+            height: 250px;
+            width: 100%;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            background: #ffcc00;
+            font-size: 18px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #ffde60;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .back-btn {
+            margin-top: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Report a City Issue</h2>
+        <div id="message" class="message"></div>
+        <form id="reportForm">
+            <div class="form-group">
+                <label for="title">Issue Title</label>
+                <input type="text" id="title" name="title" placeholder="Enter issue title" required>
+            </div>
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                    <option value="">Select Issue Type</option>
+                    <option value="pothole">Pothole on Road</option>
+                    <option value="garbage">Garbage Dump</option>
+                    <option value="streetlight">Streetlight Repair/Outage</option>
+                    <option value="water">Water Leakage</option>
+                    <option value="Toilet">Unhygienic Public toilet</option>
+                    <option value="Drainage">Clogged/Broken Drainage System</option>
+                    <option value="Contamination">Contaminated/Dirty Water Supply</option>
+                    <option value="wires">Exposed electrical Wires</option>
+                    <option value="poles">Malfunctioning/Broken Traffic Signal/Electric Poles</option>
+                    <option value="Sewage">Sewage Overflow/Leakage</option>
+                    <option value="Gas">Inspection of Gas Line</option>
+                    <option value="Infra">Infrastructure Related Issues</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="description">Description</label>
+                <textarea id="description" name="description" placeholder="Describe the issue" required></textarea>
+            </div>
+            <div class="form-group">
+                <label>Upload Photos</label>
+                <input type="file" id="photos" name="photos" accept="image/*" multiple>
+            </div>
+            <div class="form-group">
+                <label>Select Location</label>
+                <div id="map"></div>
+                <input type="hidden" id="lat" name="lat">
+                <input type="hidden" id="lng" name="lng">
+            </div>
+            <div class="form-group">
+                <label for="scheme_no">Scheme No.</label>
+                <input type="text" id="scheme_no" name="scheme_no" placeholder="Enter your Scheme Number" required>
+            </div>
+
+            <button type="submit" class="btn">Submit Report</button>
+        </form>
+        <a href="/loggined_page.html" class="back-btn">Back to Dashboard</a>
+    </div>
+
+    <script>
+        function initMap() {
+            var map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 28.7041, lng: 77.1025 },
+                zoom: 12
+            });
+
+            var marker = new google.maps.Marker({
+                position: { lat: 28.7041, lng: 77.1025 },
+                map: map,
+                draggable: true
+            });
+
+            google.maps.event.addListener(marker, 'dragend', function(event) {
+                document.getElementById("lat").value = event.latLng.lat();
+                document.getElementById("lng").value = event.latLng.lng();
+            });
+            
+            // Try to get user's current location
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    
+                    map.setCenter(userLocation);
+                    marker.setPosition(userLocation);
+                    
+                    document.getElementById("lat").value = userLocation.lat;
+                    document.getElementById("lng").value = userLocation.lng;
+                });
+            }
+        }
+
+        // Check if the user is logged in
+        function checkAuth() {
+            fetch('/check-auth')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.loggedIn) {
+                        window.location.href = '/login';
+                    }
+                })
+                .catch(error => {
+                    console.error('Authentication check failed:', error);
+                });
+        }
+
+        // Add form submission handler
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check authentication first
+            checkAuth();
+            
+            const reportForm = document.getElementById('reportForm');
+            const messageDiv = document.getElementById('message');
+            
+            reportForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Check if the form is valid
+                if (!reportForm.checkValidity()) {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = 'Please fill out all required fields';
+                    messageDiv.style.display = 'block';
+                    return;
+                }
+                
+                // Create JSON object
+                const formData = {
+                    title: document.getElementById('title').value,
+                    category: document.getElementById('category').value,
+                    description: document.getElementById('description').value,
+                    scheme_no: document.getElementById('scheme_no').value,
+                    lat: document.getElementById('lat').value || null,
+                    lng: document.getElementById('lng').value || null
+                };
+                
+                console.log("Sending data:", formData);
+                
+                // Send data to the server
+                fetch('/api/reports', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    console.log("Response status:", response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Success data:", data);
+                    if (data.success) {
+                        messageDiv.className = 'message success';
+                        messageDiv.textContent = 'Your report has been submitted successfully!';
+                        messageDiv.style.display = 'block';
+                        reportForm.reset();
+                        
+                        // Redirect after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = '/loggined_page.html';
+                        }, 2000);
+                    } else {
+                        messageDiv.className = 'message error';
+                        messageDiv.textContent = 'Error: ' + (data.message || 'Unknown error');
+                        messageDiv.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = 'An error occurred while submitting your report: ' + error.message;
+                    messageDiv.style.display = 'block';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
